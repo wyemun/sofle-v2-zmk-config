@@ -6,6 +6,7 @@
 #define DEFAULT 0
 #define LOWER   1
 #define RAISE   2
+#define ADJUST  3
 
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
@@ -14,7 +15,7 @@
 &left_encoder { resolution = <1>; };
 &right_encoder { resolution = <1>; };
 
-&mt { tapping-term-ms = <1000>; };
+&mt { tapping-term-ms = <2000>; };
 
 / {
     behaviors {
@@ -28,6 +29,15 @@
             bindings = <&none>, <&bootloader>;
         };
     };  
+
+    // Activate ADJUST layer by pressing raise and lower
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+        adjust_layer {
+            if-layers = <LOWER RAISE>;
+            then-layer = <ADJUST>;
+        };
+    };
 
     keymap {
         compatible = "zmk,keymap";
@@ -76,12 +86,30 @@
             bindings = <
 &trans &kp F1       &kp F2      &kp F3      &kp F4      &kp F5                      &kp F6          &kp F7          &kp F8          &kp F9          &kp F10         &kp F11
 &trans &trans       &trans      &trans      &trans      &kp C_PP                    &trans          &kp HOME        &kp UP          &kp END         &trans          &kp F12
-&trans &trans       &trans      &trans      &trans      &kp K_PREV                  &trans          &kp LEFT        &kp DOWN        &kp RIGHT       &trans          &bhd X X
-&trans &kp K_UNDO   &kp K_CUT   &kp K_COPY  &kp K_PASTE &kp K_NEXT  &trans  &trans  &bt BT_SEL 0    &bt BT_SEL 1    &bt BT_SEL 2    &bt BT_SEL 3    &bt BT_SEL 4    &bt BT_CLR
+&trans &trans       &trans      &trans      &trans      &kp K_PREV                  &trans          &kp LEFT        &kp DOWN        &kp RIGHT       &trans          &trans 
+&trans &kp K_UNDO   &kp K_CUT   &kp K_COPY  &kp K_PASTE &kp K_NEXT  &trans  &trans  &trans          &trans          &trans          &trans          &trans          &trans
                     &trans      &trans      &trans      &trans      &trans  &trans  &trans          &trans          &trans          &kp PSCRN
             >;
 
             sensor-bindings = <&inc_dec_kp RIGHT LEFT &inc_dec_kp C_BRI_DN C_BRI_UP>;
         };
+
+// ------------------------------------------------------------------------------------------------------------
+// |BTCLR | BT1   | BT2   |  BT3  |  BT4  |  BT5  |                |      |      |       |      |       |       |
+// |      |       |       |       |       |       |                |      |      |       |      |       |       |
+// |      |       |       |       |       |       |                |      |      |       |      |       |       |
+// |      |       |       |       |       |       |       | |      |      |       |      |       |       |
+//                |       |       |       |       |       | |      |      |      |       |      |
+
+        adjust_layer {
+            bindings = <
+&bt BT_CLR  &bt BT_SEL 0    &bt BT_SEL 1    &bt BT_SEL 2    &bt BT_SEL 3    &bt BT_SEL 4                          &none &none &none &none &none &none
+&none       &none           &none           &none           &none           &none                                 &none &none &none &none &none &none
+&bhd X X    &none           &none           &none           &none           &none                                 &none &none &none &none &none &bhd X X
+&none       &none           &none           &none           &none           &none               &none  &none      &none &none &none &none &none &none
+                            &none           &none           &none           &none               &none  &none      &none &none &none &none
+            >;
+        };
+
     };
 };
